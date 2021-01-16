@@ -54,7 +54,7 @@ module GraphqlPaginator
       def default_options
         {
           name: :collection,
-          null: false,
+          null: true,
           paginated_name: :pagination
         }
       end
