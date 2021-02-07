@@ -7,11 +7,10 @@ loader.setup
 
 module GraphqlPaginator
   def self.configure
-    @config ||= Config.new
-    yield(configuration)
+    yield(config)
   end
 
   def self.config
-    @config
+    @config ||= Config.new
   end
 end

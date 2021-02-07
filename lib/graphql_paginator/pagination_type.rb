@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphqlPaginator
   class PaginationType < GraphQL::Schema::Object
     field :total_count, Integer, 'Total count of items', null: false

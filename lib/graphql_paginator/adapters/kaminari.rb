@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphqlPaginator
   module Adapters
     module Kaminari
@@ -7,9 +9,8 @@ module GraphqlPaginator
       end
 
       def paginate_collection(entries, options = nil)
-        raise ArugmentError, 'entries argument must be Enumerable' if entries.is_a?()
+        raise ArugmentError, 'entries argument must be Enumerable' if entries.is_a?
 
-        
         collection_name = options[:name] || GraphqlPaginator.config[:collection_name]
         pagination_name = options[:pagination] || GraphqlPaginator.config[:pagination_name]
 
@@ -17,7 +18,7 @@ module GraphqlPaginator
 
         {
           collection_name => paginated,
-          pagination_name => populate_pagination(paginated),
+          pagination_name => populate_pagination(paginated)
         }
       end
 

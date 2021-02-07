@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module GraphqlPaginator
   module Types
     def self.included(klass)
@@ -5,15 +7,13 @@ module GraphqlPaginator
     end
 
     module ClassMethods
-      @@consts = {}
-
       def paginated(type, options = nil)
         unless type.ancestors.include?(GraphQL::Schema::Object)
           raise ArgumentError,
-                "type argument must be a class inherited from GraphQL::Schema::Object class"
+                'type argument must be a class inherited from GraphQL::Schema::Object class'
         end
 
-        options ||= default_options
+        options = default_options.merge(options || {})
         define_pagination_type(type.to_s, options)
       end
 
@@ -21,16 +21,16 @@ module GraphqlPaginator
 
       def define_pagination_type(base_type, options)
         pagination_type = pagination_type_const(base_type)
-        
-        if @@consts[pagination_type]
-          @@consts[pagination_type]
-        else
-          @@consts[pagination_type] = create_graphql_const(
-            base_type,
-            pagination_type,
-            options
-          )
-        end
+        return registry.get(pagination_type) if registry.exists?(pagination_type)
+
+        const = create_graphql_const(
+          base_type,
+          pagination_type,
+          options
+        )
+
+        registry.add(pagination_type, const)
+        const
       end
 
       def create_graphql_const(base_type, paginated_type, options)
@@ -43,7 +43,7 @@ module GraphqlPaginator
 
       def pagination_type_const(base_type)
         klass_name = base_type.to_s.split('::').last
-        
+
         if klass_name =~ /Type$/
           klass_name.gsub(/Type$/, 'PaginatedType')
         else
@@ -53,10 +53,14 @@ module GraphqlPaginator
 
       def default_options
         {
-          name: :collection,
-          null: true,
-          paginated_name: :pagination
+          name: GraphqlPaginator.config.collection_name,
+          null: GraphqlPaginator.config.nullify,
+          paginated_name: GraphqlPaginator.config.pagination_name
         }
+      end
+
+      def registry
+        GraphqlPaginator::Registry
       end
     end
   end
